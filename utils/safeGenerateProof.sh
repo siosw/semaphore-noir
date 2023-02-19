@@ -10,7 +10,7 @@ read name_build
 
 cd circuits/
 printf "\n#################\n\n"
-nargo build
+nargo check
 printf "\n#################\n\n"
 nargo compile ${name_build}
 printf "\n#################\n\n"

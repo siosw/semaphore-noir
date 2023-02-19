@@ -10,7 +10,7 @@ function path_to_uint8array(path: string) {
 }
 
 async function generateProof() {
-    let acirByteArray = path_to_uint8array(path.resolve(__dirname, `../circuits/build/${process.argv[2]}.acir`));
+    let acirByteArray = path_to_uint8array(path.resolve(__dirname, `../circuits/target/${process.argv[2]}.acir`));
     let acir = acir_from_bytes(acirByteArray);
 
     let abi = {

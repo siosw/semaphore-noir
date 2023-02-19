@@ -11,7 +11,7 @@ printf "\n#################\n\n"
 
 cd circuits/
 
-nargo build
+nargo check 
 printf "\n#################\n\n"
 
 nargo compile ${name_build}

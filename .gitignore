@@ -1,6 +1,6 @@
 out/
 cache/
-circuits/build/
+circuits/target/
 artifacts/
 circuits/proofs/
 # Logs
