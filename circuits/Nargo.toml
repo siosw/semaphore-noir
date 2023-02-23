@@ -1,6 +1,5 @@
 [package]
-authors = ["exp.table"]
+authors = [""]
 compiler_version = "0.1"
 
 [dependencies]
-    
