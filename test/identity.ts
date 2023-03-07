@@ -75,7 +75,7 @@ describe("Identity", () => {
 
             const trapdoor = identity.getTrapdoor()
 
-            expect(trapdoor).to.equal(BigInt("211007102311354422986775462856672883657031335757695461477990303178796954863"))
+            expect(trapdoor).to.equal(BigInt("17906236466232737907147794441632041075753380435188700290746684527271267571831"))
         })
     })
 
@@ -85,7 +85,7 @@ describe("Identity", () => {
 
             const nullifier = identity.getNullifier()
 
-            expect(nullifier).to.equal(BigInt("10282208199720122340759039255952223220417076359839127631923809108800013776"))
+            expect(nullifier).to.equal(BigInt("2874742421306248266628040105635469475888107352869673830515298074477987992445"))
         })
     })
 
@@ -94,7 +94,7 @@ describe("Identity", () => {
             const { commitment } = new Identity(wasm, "message")
 
             expect(commitment).to.equal(
-                BigInt("13192222509545780880434144549342414064490325100975031303723930089730328393905")
+                BigInt("17525199588821982821312494017465230643053253141665177985750241965577183956036")
             )
         })
     })
