@@ -47,3 +47,15 @@ export function isJsonArray(jsonString: string) {
         return false
     }
 }
+
+
+export function pedersenFactory(wasm: BarretenbergWasm) {
+  const pedersen = new SinglePedersen(wasm)
+
+  return (message: any) => {
+  const hash = pedersen.compressInputs(message)
+      return hash as any
+    // return hash as any;
+
+  }
+}
