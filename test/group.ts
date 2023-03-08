@@ -19,7 +19,7 @@ describe("Group", () => {
             expect(group.id).to.equal(1)
             expect(group.root.toString()).to.contain("246106")
             expect(group.depth).to.equal(20)
-            // expect(group.zeroValue).to.equal(hash(1))
+            expect(group.zeroValue).to.equal(hash(wasm, '1'))
             expect(group.members.length).to.equal(0)
         })
 
@@ -30,11 +30,11 @@ describe("Group", () => {
         })
 
         it("Should create a group with different parameters", () => {
-            const group = new Group(wasm, 1, 32)
+            const group = new Group(wasm, 2, 32)
 
-            expect(group.root.toString()).to.contain("1416463")
+            expect(group.root.toString()).to.contain("1558831")
             expect(group.depth).to.equal(32)
-            // expect(group.zeroValue).to.equal(hash(wasm, 1))
+            expect(group.zeroValue).to.equal(hash(wasm, '2'))
             expect(group.members.length).to.equal(0)
         })
     })

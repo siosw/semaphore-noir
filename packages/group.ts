@@ -30,6 +30,7 @@ export default class Group {
         this.merkleTree = new IncrementalMerkleTree(pedersen, treeDepth, hash(this._wasm, id.toString()), 2)
     }
 
+    
     private pedersenFactory(): HashFunction {
       return (preimage: Node[]): Node => hash(this._wasm, preimage.toString())
     }

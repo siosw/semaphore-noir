@@ -6,6 +6,11 @@ import { randomBytes } from "@ethersproject/random"
 import { serialise_public_inputs } from '@noir-lang/aztec_backend';
 
 
+/**
+ * Serialise inputs to hash function.
+ * @param values Input values.
+ * @returns Buffer.
+ */
 export function serialiseInputs(values: bigint[]) {
     return values.map(v => {
       const hex = v.toString(16);
@@ -46,16 +51,4 @@ export function isJsonArray(jsonString: string) {
     } catch (error) {
         return false
     }
-}
-
-
-export function pedersenFactory(wasm: BarretenbergWasm) {
-  const pedersen = new SinglePedersen(wasm)
-
-  return (message: any) => {
-  const hash = pedersen.compressInputs(message)
-      return hash as any
-    // return hash as any;
-
-  }
 }
