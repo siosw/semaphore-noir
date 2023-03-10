@@ -95,6 +95,19 @@ describe("Group", () => {
     })
 
     describe("# generateMerkleProof", () => {
+        it("Should create deterministic root", () => {
+            const groupA = new Group(wasm, 1)
+            const groupB = new Group(wasm, 1)
+
+            groupA.addMembers([BigInt(1), BigInt(3)])
+            groupB.addMembers([BigInt(1), BigInt(3)])
+
+            expect(groupA.members.length).to.equal(2)
+            expect(groupB.members.length).to.equal(2)
+
+            expect(groupA.root).to.equal(groupB.root)
+        })
+
         it("Should generate a proof of membership", () => {
             const group = new Group(wasm, 1)
             group.addMembers([BigInt(1), BigInt(3)])
