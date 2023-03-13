@@ -1,102 +1,102 @@
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-import { BigNumber } from "@ethersproject/bignumber"
-import checkParameter from "./checkParameter"
-import { genRandomNumber, isJsonArray } from "./utils"
-import { HashFunction } from '../types';
+import { BigNumber } from "@ethersproject/bignumber";
+import { genRandomNumber, isJsonArray } from "./utils";
+import { type HashFunction } from "../types";
 import { stringToFields } from "./hash";
 
 export default class Identity {
-    private _trapdoor: bigint
-    private _nullifier: bigint
-    private _commitment: bigint
+  private readonly _trapdoor: bigint;
+  private readonly _nullifier: bigint;
+  private readonly _commitment: bigint;
 
-    /**
-     * Initializes the class attributes based on the strategy passed as parameter.
-     * @param identityOrMessage Additional data needed to create identity for given strategy.
-     */
-    constructor(hash: HashFunction, identityOrMessage?: string) {
-        if (identityOrMessage === undefined) {
-            this._trapdoor = genRandomNumber()
-            this._nullifier = genRandomNumber()
-            this._commitment = hash([hash([this._nullifier, this._trapdoor])])
+  /**
+   * Initializes the class attributes based on the strategy passed as parameter.
+   * @param identityOrMessage Additional data needed to create identity for given strategy.
+   */
+  constructor(hash: HashFunction, identityOrMessage?: string) {
+    if (identityOrMessage === undefined) {
+      this._trapdoor = genRandomNumber();
+      this._nullifier = genRandomNumber();
+      this._commitment = hash([hash([this._nullifier, this._trapdoor])]);
 
-            return
-        }
-
-        checkParameter(identityOrMessage, "identityOrMessage", "string")
-
-        if (!isJsonArray(identityOrMessage)) {
-            const messageHash = hash(stringToFields(identityOrMessage))
-
-            this._trapdoor = hash(stringToFields(`${messageHash}identity_trapdoor`))
-            this._nullifier = hash(stringToFields(`${messageHash}identity_nullifier`))
-            this._commitment = hash([hash([this._nullifier, this._trapdoor])])
-
-            return
-        }
-
-        const [trapdoor, nullifier] = JSON.parse(identityOrMessage)
-
-        this._trapdoor = BigNumber.from(`0x${trapdoor}`).toBigInt()
-        this._nullifier = BigNumber.from(`0x${nullifier}`).toBigInt()
-        this._commitment = hash([hash([this._nullifier, this._trapdoor])])
+      return;
     }
 
-    /**
-     * Returns the identity trapdoor.
-     * @returns The identity trapdoor.
-     */
-    public get trapdoor(): bigint {
-        return this._trapdoor
+    if (!isJsonArray(identityOrMessage)) {
+      const messageHash = hash(stringToFields(identityOrMessage));
+
+      this._trapdoor = hash(stringToFields(`${messageHash}identity_trapdoor`));
+      this._nullifier = hash(
+        stringToFields(`${messageHash}identity_nullifier`)
+      );
+      this._commitment = hash([hash([this._nullifier, this._trapdoor])]);
+
+      return;
     }
 
-    /**
-     * Returns the identity trapdoor.
-     * @returns The identity trapdoor.
-     */
-    public getTrapdoor(): bigint {
-        return this._trapdoor
-    }
+    const [trapdoor, nullifier]: string[] = JSON.parse(identityOrMessage);
 
-    /**
-     * Returns the identity nullifier.
-     * @returns The identity nullifier.
-     */
-    public get nullifier(): bigint {
-        return this._nullifier
-    }
+    this._trapdoor = BigNumber.from(`0x${trapdoor}`).toBigInt();
+    this._nullifier = BigNumber.from(`0x${nullifier}`).toBigInt();
+    this._commitment = hash([hash([this._nullifier, this._trapdoor])]);
+  }
 
-    /**
-     * Returns the identity nullifier.
-     * @returns The identity nullifier.
-     */
-    public getNullifier(): bigint {
-        return this._nullifier
-    }
+  /**
+   * Returns the identity trapdoor.
+   * @returns The identity trapdoor.
+   */
+  public get trapdoor(): bigint {
+    return this._trapdoor;
+  }
 
-    /**
-     * Returns the identity commitment.
-     * @returns The identity commitment.
-     */
-    public get commitment(): bigint {
-        return this._commitment
-    }
+  /**
+   * Returns the identity trapdoor.
+   * @returns The identity trapdoor.
+   */
+  public getTrapdoor(): bigint {
+    return this._trapdoor;
+  }
 
-    /**
-     * Returns the identity commitment.
-     * @returns The identity commitment.
-     */
-    public getCommitment(): bigint {
-        return this._commitment
-    }
+  /**
+   * Returns the identity nullifier.
+   * @returns The identity nullifier.
+   */
+  public get nullifier(): bigint {
+    return this._nullifier;
+  }
 
-    /**
-     * Returns a JSON string with trapdoor and nullifier. It can be used
-     * to export the identity and reuse it later.
-     * @returns The string representation of the identity.
-     */
-    public toString(): string {
-        return JSON.stringify([this._trapdoor.toString(16), this._nullifier.toString(16)])
-    }
+  /**
+   * Returns the identity nullifier.
+   * @returns The identity nullifier.
+   */
+  public getNullifier(): bigint {
+    return this._nullifier;
+  }
+
+  /**
+   * Returns the identity commitment.
+   * @returns The identity commitment.
+   */
+  public get commitment(): bigint {
+    return this._commitment;
+  }
+
+  /**
+   * Returns the identity commitment.
+   * @returns The identity commitment.
+   */
+  public getCommitment(): bigint {
+    return this._commitment;
+  }
+
+  /**
+   * Returns a JSON string with trapdoor and nullifier. It can be used
+   * to export the identity and reuse it later.
+   * @returns The string representation of the identity.
+   */
+  public toString(): string {
+    return JSON.stringify([
+      this._trapdoor.toString(16),
+      this._nullifier.toString(16),
+    ]);
+  }
 }

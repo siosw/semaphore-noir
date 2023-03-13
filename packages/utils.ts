@@ -1,25 +1,5 @@
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-import { BarretenbergWasm, SinglePedersen } from '@noir-lang/barretenberg';
-import { BigNumber } from "@ethersproject/bignumber"
-import { randomBytes } from "@ethersproject/random"
-import { serialise_public_inputs } from '@noir-lang/aztec_backend';
-import hash from "./hash"
-import { HashFunction, Node } from '../types';
-
-
-/**
- * Serialise inputs to hash function.
- * @param values Input values.
- * @returns Buffer.
- */
-export function serialiseInputs(values: bigint[]) {
-    return values.map(v => {
-      const hex = v.toString(16);
-      const paddedHex = hex.length % 2 === 0 ? '0x' + hex : '0x0' + hex;
-      return Buffer.from(serialise_public_inputs([paddedHex]));
-    });
-}
+import { BigNumber } from "@ethersproject/bignumber";
+import { randomBytes } from "@ethersproject/random";
 
 /**
  * Generates a random big number.
@@ -27,29 +7,7 @@ export function serialiseInputs(values: bigint[]) {
  * @returns The generated random number.
  */
 export function genRandomNumber(numberOfBytes = 31): bigint {
-    return BigNumber.from(randomBytes(numberOfBytes)).toBigInt()
-}
-
-/**
- * Returns a wrapped pedersen hash function to match HashFunction signature 
- * @returns pedersen hash function
- */
-export async function pedersenFactory(): Promise<HashFunction> {
-  const wasm = new BarretenbergWasm()
-  await wasm.init()
-  return (preimage: Node[]): Node => hash(wasm, preimage)
-}
-
-/**
- * Generates the identity commitment from trapdoor and nullifier.
- * @param nullifier The identity nullifier.
- * @param trapdoor The identity trapdoor.
- * @returns identity commitment
- */
-export function generateCommitment(wasm: BarretenbergWasm, nullifier: bigint, trapdoor: bigint): bigint {
-    const pedersen = new SinglePedersen(wasm)
-    const secret = pedersen.compressInputs(serialiseInputs([nullifier, trapdoor]))
-    return BigInt(`0x${pedersen.compressInputs([secret]).toString('hex')}`)
+  return BigNumber.from(randomBytes(numberOfBytes)).toBigInt();
 }
 
 /**
@@ -57,10 +15,10 @@ export function generateCommitment(wasm: BarretenbergWasm, nullifier: bigint, tr
  * @param jsonString The JSON string.
  * @returns True or false.
  */
-export function isJsonArray(jsonString: string) {
-    try {
-        return Array.isArray(JSON.parse(jsonString))
-    } catch (error) {
-        return false
-    }
+export function isJsonArray(jsonString: string): boolean {
+  try {
+    return Array.isArray(JSON.parse(jsonString));
+  } catch (error) {
+    return false;
+  }
 }

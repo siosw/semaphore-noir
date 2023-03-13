@@ -1,12 +1,12 @@
 export type BigNumberish = string | number | bigint;
 
-export type Node = any
+export type Node = bigint;
 
-export type HashFunction = (values: Node[]) => Node
+export type HashFunction = (values: Node[]) => Node;
 
-export type MerkleProof = {
-    root: any
-    leaf: any
-    siblings: any[]
-    pathIndices: number[]
+export interface MerkleProof {
+  root: bigint;
+  leaf: bigint;
+  siblings: bigint[];
+  pathIndices: number[];
 }
