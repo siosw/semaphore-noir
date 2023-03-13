@@ -1,6 +1,6 @@
 // use dep::std;
 
-global LEVELS: Field = 2;
+global LEVELS: Field = 3;
 // 
 
 #[foreign(pedersen)]
@@ -34,8 +34,9 @@ fn main(
   siblings: [Field; LEVELS],
   indices: Field,
   external_nullifier: Field,
-  // debug: pub Field
-) -> pub [Field; 2] {
+  root: pub Field,
+  nullifier_hash: pub Field
+) {
   // reconstruct the commitment from the private nullfiers
   let secret = pedersen([id_nullifier, id_trapdoor]);
   let id_commitment = pedersen([secret[0]]);
@@ -43,12 +44,9 @@ fn main(
   // compute the root of the merkle tree given the provided merkle merkle path
   // and the reconstructed id commitment
   // this can later be verified against a trusted root onchain or offchain
-  let root = compute_root_from_leaf(id_commitment[0], indices, siblings); 
-  // let root = id_commitment[0] * indices * siblings[0];
+  constrain root == compute_root_from_leaf(id_commitment[0], indices, siblings);
 
   // the nullifier hash allows us to check how often a given identity signaled per topic
   // every topic should use a distinct external nullifier
-  let nullifier_hash = pedersen([external_nullifier, id_nullifier]);
-
-  [root, nullifier_hash[0]]
+  constrain nullifier_hash == pedersen([external_nullifier, id_nullifier])[0];
 }

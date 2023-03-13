@@ -1,5 +1,3 @@
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-expect-error
 import {
   setup_generic_prover_and_verifier,
   create_proof,
@@ -46,7 +44,7 @@ describe("IdentityCircuit", function () {
       pub_commitment: serialiseInputs([identity.getCommitment()]),
     };
 
-    console.log(abi);
+    console.log({ abi });
 
     const [prover, verifier] = await setup_generic_prover_and_verifier(acir);
 

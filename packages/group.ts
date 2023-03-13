@@ -14,9 +14,9 @@ export default class Group {
    * @param treeDepth Tree depth.
    */
   constructor(hash: HashFunction, id: BigNumberish, treeDepth = 20) {
-    if (treeDepth < 16 || treeDepth > 32) {
-      throw new Error("The tree depth must be between 16 and 32");
-    }
+    // if (treeDepth < 16 || treeDepth > 32) {
+    //   throw new Error("The tree depth must be between 16 and 32");
+    // }
 
     this._id = id;
 
