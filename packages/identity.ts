@@ -1,28 +1,25 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-import { BarretenbergWasm } from '@noir-lang/barretenberg';
 import { BigNumber } from "@ethersproject/bignumber"
 import checkParameter from "./checkParameter"
-import hash from "./hash"
-import { generateCommitment, genRandomNumber, isJsonArray } from "./utils"
+import { genRandomNumber, isJsonArray } from "./utils"
+import { HashFunction } from '../types';
+import { stringToFields } from "./hash";
 
 export default class Identity {
     private _trapdoor: bigint
     private _nullifier: bigint
     private _commitment: bigint
-    private _wasm: BarretenbergWasm
 
     /**
      * Initializes the class attributes based on the strategy passed as parameter.
      * @param identityOrMessage Additional data needed to create identity for given strategy.
      */
-    constructor(wasm: BarretenbergWasm, identityOrMessage?: string) {
-        this._wasm = wasm
-
+    constructor(hash: HashFunction, identityOrMessage?: string) {
         if (identityOrMessage === undefined) {
             this._trapdoor = genRandomNumber()
             this._nullifier = genRandomNumber()
-            this._commitment = generateCommitment(this._wasm, this._nullifier, this._trapdoor)
+            this._commitment = hash([hash([this._nullifier, this._trapdoor])])
 
             return
         }
@@ -30,11 +27,11 @@ export default class Identity {
         checkParameter(identityOrMessage, "identityOrMessage", "string")
 
         if (!isJsonArray(identityOrMessage)) {
-            const messageHash = hash(this._wasm, identityOrMessage)
+            const messageHash = hash(stringToFields(identityOrMessage))
 
-            this._trapdoor = hash(this._wasm, `${messageHash}identity_trapdoor`)
-            this._nullifier = hash(this._wasm, `${messageHash}identity_nullifier`)
-            this._commitment = generateCommitment(this._wasm, this._nullifier, this._trapdoor)
+            this._trapdoor = hash(stringToFields(`${messageHash}identity_trapdoor`))
+            this._nullifier = hash(stringToFields(`${messageHash}identity_nullifier`))
+            this._commitment = hash([hash([this._nullifier, this._trapdoor])])
 
             return
         }
@@ -43,7 +40,7 @@ export default class Identity {
 
         this._trapdoor = BigNumber.from(`0x${trapdoor}`).toBigInt()
         this._nullifier = BigNumber.from(`0x${nullifier}`).toBigInt()
-        this._commitment = generateCommitment(this._wasm, this._nullifier, this._trapdoor)
+        this._commitment = hash([hash([this._nullifier, this._trapdoor])])
     }
 
     /**

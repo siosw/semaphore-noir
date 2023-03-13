@@ -1,12 +1,14 @@
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-import { BarretenbergWasm, setup_generic_prover_and_verifier, create_proof, verify_proof } from '@noir-lang/barretenberg';
+import { setup_generic_prover_and_verifier, create_proof, verify_proof } from '@noir-lang/barretenberg';
 import { compile } from '@noir-lang/noir_wasm';
 import path from 'path';
 import { expect } from 'chai';
 import { serialise_public_inputs } from '@noir-lang/aztec_backend';
 import Identity from '../packages/identity'
+import { pedersenFactory } from '../packages/hash';
+import { HashFunction } from '../types';
 
 
 // TODO: share serialisation functions accross files
@@ -20,18 +22,17 @@ function serialiseInputs(values: bigint[]): string[] {
 }
 
 describe("IdentityCircuit", function () {
-    let wasm: BarretenbergWasm
+  let pedersen: HashFunction
 
     before(async () => {
-      wasm = await BarretenbergWasm.new()
-      await wasm.init()
+      pedersen = await pedersenFactory()
     });
 
   it("identity calculation should be identical in TS and Noir", async function() {        
     const compiled_program = compile(path.resolve(__dirname, '../circuits/src/identity.nr')); 
     let acir = compiled_program.circuit;
 
-    const identity = new Identity(wasm);
+    const identity = new Identity(pedersen);
 
     const abi = {
       id_nullifier: serialiseInputs([identity.getNullifier()]),
@@ -56,7 +57,7 @@ describe("IdentityCircuit", function () {
     const compiled_program = compile(path.resolve(__dirname, '../circuits/src/identity.nr')); 
     let acir = compiled_program.circuit;
 
-    const identity = new Identity(wasm);
+    const identity = new Identity(pedersen);
 
     const abi = {
       id_nullifier: '0x00',
@@ -79,7 +80,7 @@ describe("IdentityCircuit", function () {
     const compiled_program = compile(path.resolve(__dirname, '../circuits/src/identity.nr')); 
     let acir = compiled_program.circuit;
 
-    const identity = new Identity(wasm);
+    const identity = new Identity(pedersen);
 
     const abi = {
       id_nullifier: serialiseInputs([identity.getNullifier()]),

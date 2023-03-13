@@ -4,6 +4,8 @@ import { BarretenbergWasm, SinglePedersen } from '@noir-lang/barretenberg';
 import { BigNumber } from "@ethersproject/bignumber"
 import { randomBytes } from "@ethersproject/random"
 import { serialise_public_inputs } from '@noir-lang/aztec_backend';
+import hash from "./hash"
+import { HashFunction, Node } from '../types';
 
 
 /**
@@ -26,6 +28,16 @@ export function serialiseInputs(values: bigint[]) {
  */
 export function genRandomNumber(numberOfBytes = 31): bigint {
     return BigNumber.from(randomBytes(numberOfBytes)).toBigInt()
+}
+
+/**
+ * Returns a wrapped pedersen hash function to match HashFunction signature 
+ * @returns pedersen hash function
+ */
+export async function pedersenFactory(): Promise<HashFunction> {
+  const wasm = new BarretenbergWasm()
+  await wasm.init()
+  return (preimage: Node[]): Node => hash(wasm, preimage)
 }
 
 /**

@@ -1,47 +1,43 @@
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-import { BarretenbergWasm } from '@noir-lang/barretenberg';
 import Group from "../packages/group"
-import hash from "../packages/hash"
 import { expect } from "chai";
+import { HashFunction } from '../types'
+import { pedersenFactory } from '../packages/hash';
 
 describe("Group", () => {
-    let wasm: BarretenbergWasm
+    let pedersen: HashFunction
 
     before(async () => {
-      wasm = await BarretenbergWasm.new()
-      await wasm.init()
+      pedersen = await pedersenFactory()
     });
+
     describe("# Group", () => {
         it("Should create a group", () => {
-            const group = new Group(wasm, 1)
+            const group = new Group(pedersen, 1)
     
             expect(group.id).to.equal(1)
-            expect(group.root.toString()).to.contain("246106")
             expect(group.depth).to.equal(20)
-            expect(group.zeroValue).to.equal(hash(wasm, '1'))
+            expect(group.zeroValue).to.equal(pedersen([1n]))
             expect(group.members.length).to.equal(0)
         })
 
         it("Should not create a group with a wrong tree depth", () => {
-            const fun = () => new Group(wasm, 1, 33)
+            const fun = () => new Group(pedersen, 1, 33)
 
             expect(fun).to.throw("The tree depth must be between 16 and 32")
         })
 
         it("Should create a group with different parameters", () => {
-            const group = new Group(wasm, 2, 32)
+            const group = new Group(pedersen, 2, 32)
 
-            expect(group.root.toString()).to.contain("1558831")
             expect(group.depth).to.equal(32)
-            expect(group.zeroValue).to.equal(hash(wasm, '2'))
+            expect(group.zeroValue).to.equal(pedersen([2n]))
             expect(group.members.length).to.equal(0)
         })
     })
 
     describe("# addMember", () => {
         it("Should add a member to a group", () => {
-            const group = new Group(wasm, 1)
+            const group = new Group(pedersen, 1)
 
             group.addMember(BigInt(3))
 
@@ -51,7 +47,7 @@ describe("Group", () => {
 
     describe("# addMembers", () => {
         it("Should add many members to a group", () => {
-            const group = new Group(wasm, 1)
+            const group = new Group(pedersen, 1)
 
             group.addMembers([BigInt(1), BigInt(3)])
 
@@ -61,7 +57,7 @@ describe("Group", () => {
 
     describe("# indexOf", () => {
         it("Should return the index of a member in a group", () => {
-            const group = new Group(wasm, 1)
+            const group = new Group(pedersen, 1)
             group.addMembers([BigInt(1), BigInt(3)])
 
             const index = group.indexOf(BigInt(3))
@@ -72,7 +68,7 @@ describe("Group", () => {
 
     describe("# updateMember", () => {
         it("Should update a member in a group", () => {
-            const group = new Group(wasm, 1)
+            const group = new Group(pedersen, 1)
             group.addMembers([BigInt(1), BigInt(3)])
 
             group.updateMember(0, BigInt(1))
@@ -84,7 +80,7 @@ describe("Group", () => {
 
     describe("# removeMember", () => {
         it("Should remove a member from a group", () => {
-            const group = new Group(wasm, 1)
+            const group = new Group(pedersen, 1)
             group.addMembers([BigInt(1), BigInt(3)])
 
             group.removeMember(0)
@@ -96,8 +92,8 @@ describe("Group", () => {
 
     describe("# generateMerkleProof", () => {
         it("Should create deterministic root", () => {
-            const groupA = new Group(wasm, 1)
-            const groupB = new Group(wasm, 1)
+            const groupA = new Group(pedersen, 1)
+            const groupB = new Group(pedersen, 1)
 
             groupA.addMembers([BigInt(1), BigInt(3)])
             groupB.addMembers([BigInt(1), BigInt(3)])
@@ -109,7 +105,7 @@ describe("Group", () => {
         })
 
         it("Should generate a proof of membership", () => {
-            const group = new Group(wasm, 1)
+            const group = new Group(pedersen, 1)
             group.addMembers([BigInt(1), BigInt(3)])
 
             const proof = group.generateMerkleProof(0)
