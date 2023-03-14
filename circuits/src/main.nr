@@ -1,27 +1,47 @@
 // use dep::std;
 
 global LEVELS: Field = 3;
-// 
+
 
 #[foreign(pedersen)]
 fn pedersen<N>(_input : [Field; N]) -> [Field; 2] {}
 
-#[builtin(to_le_bits)]
-fn to_le_bits(_x : Field, _bit_size: u32) -> [u1] {}
+fn modulo(_a: u32, _b: u32) -> u1 {
+  (_a - (_a / (_b * _b))) as u1
+}
+
+// #[builtin(to_le_bits)]
+// fn to_le_bits(_x : Field, _bit_size: u32) -> [u1] {}
+
+// native Noir implementation of to_le_bits
+// when compiling from TS the builtin causes the proof generation to fail.
+fn to_le_bits(_x : Field) -> [u1; LEVELS] {
+  let mut remainder = _x as u32;
+  let z: u1 = 0;
+  let mut bits: [u1; LEVELS] = [z, z, z];
+  for i in 0..LEVELS {
+    bits[i] = modulo(remainder, 2);
+    remainder = remainder / 2;
+  }
+
+  bits
+}
+
 
 // Returns the root of the tree from the provided leaf and its hashpath, using pedersen hash
 fn compute_root_from_leaf(leaf : Field, index : Field, hash_path: [Field]) -> Field {
-    // let n = hash_path.len();
     let n = LEVELS;
-    let index_bits = to_le_bits(index, n as u32);
+    let index_bits = to_le_bits(index);
     let mut current = leaf;
+
     for i in 0..n {
-        let path_bit = index_bits[i] as bool;
-        let (hash_left, hash_right) = if path_bit {
-            (hash_path[i], current)
-         } else {
-            (current, hash_path[i])
-         };
+      let mut path_bit = index_bits[i] as bool;
+
+      let (hash_left, hash_right) = if path_bit {
+        (hash_path[i], current)
+      } else {
+        (current, hash_path[i])
+      };
 
       current = pedersen([hash_left, hash_right])[0];
     };
@@ -49,4 +69,10 @@ fn main(
   // the nullifier hash allows us to check how often a given identity signaled per topic
   // every topic should use a distinct external nullifier
   constrain nullifier_hash == pedersen([external_nullifier, id_nullifier])[0];
+  // [
+  //   root, 
+  //   compute_root_from_leaf(id_commitment[0], indices, siblings), 
+  //   nullifier_hash, 
+  //   pedersen([external_nullifier, id_nullifier])[0]
+  // ]
 }
