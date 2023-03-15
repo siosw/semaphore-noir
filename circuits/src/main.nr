@@ -55,7 +55,8 @@ fn main(
   indices: Field,
   external_nullifier: Field,
   root: pub Field,
-  nullifier_hash: pub Field
+  nullifier_hash: pub Field,
+  signal_hash: pub Field
 ) {
   // reconstruct the commitment from the private nullfiers
   let secret = pedersen([id_nullifier, id_trapdoor]);
@@ -69,6 +70,11 @@ fn main(
   // the nullifier hash allows us to check how often a given identity signaled per topic
   // every topic should use a distinct external nullifier
   constrain nullifier_hash == pedersen([external_nullifier, id_nullifier])[0];
+  
+  // dummy operation to prevent signal hash tampering.
+  let mut signal_square = signal_hash;
+  signal_square = signal_square * signal_hash;
+
   // [
   //   root, 
   //   compute_root_from_leaf(id_commitment[0], indices, siblings), 
