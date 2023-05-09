@@ -24,6 +24,7 @@ async function compile2() {
           }
       });
       
+      // enter circuit to compile
       const compiled_noir = compile({
           entry_point: 'semaphore.nr',
       });
