@@ -1,8 +1,6 @@
-// this includes a subset of the full semaphore circuit
-// to allow testing of the identity computation in isolation
 
-#[foreign(pedersen)]
-fn pedersen<N>(_input : [Field; N]) -> [Field; 2] {}
+
+use dep::std;
 
 fn main(
   id_nullifier: Field,
@@ -10,8 +8,9 @@ fn main(
   pub_commitment: pub Field,
 ) {
   // reconstruct the commitment from the private nullfiers
-  let secret = pedersen([id_nullifier, id_trapdoor]);
-  let id_commitment = pedersen([secret[0]]);
+  let secret =  std::hash::pedersen([id_nullifier, id_trapdoor]);
+  let id_commitment =  std::hash::pedersen([secret[0]]);
 
   constrain pub_commitment == id_commitment[0];
+
 }
