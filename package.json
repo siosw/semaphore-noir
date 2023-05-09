@@ -1,13 +1,24 @@
 {
   "name": "hardhat-project",
+
+  "scripts": {
+    "test": "mocha --require ts-node/register test/*.ts --timeout 20000"
+  },
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^2.0.1",
-    "hardhat": "^2.12.7"
+    "chai": "^4.3.7",
+    "hardhat": "^2.12.7",
+    "mocha": "^10.2.0",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.0.4"
   },
   "dependencies": {
-    "@noir-lang/aztec_backend": "github:kobyhallx/aztec-backend#1bcdd4bf67dad1ab977867f1d655bcab7085a518",
+    "@noir-lang/aztec_backend": "^0.1.0-0c3b2f2",
     "@noir-lang/barretenberg": "github:noir-lang/barretenberg#39a1547875f941ef6640217a42d8f34972425c97",
-    "@noir-lang/noir_wasm": "0.2.0-ca986a4",
-    "@zk-kit/incremental-merkle-tree": "^1.0.0"
+    "@noir-lang/noir_wasm": "^0.3.2-fa0e9cff",
+    "@noir-lang/noir-source-resolver": "^1.1.1",
+    "@zk-kit/incremental-merkle-tree": "^1.0.0",
+    "i": "^0.3.7",
+    "npm": "^9.6.6"
   }
 }
