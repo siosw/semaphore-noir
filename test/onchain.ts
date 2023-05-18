@@ -1,8 +1,10 @@
+
 import {
   setup_generic_prover_and_verifier,
   create_proof,
   verify_proof,
 } from "@noir-lang/barretenberg";
+import { ethers } from "hardhat";
 import { compile, acir_read_bytes } from "@noir-lang/noir_wasm";
 import { serialise_public_inputs } from "@noir-lang/aztec_backend";
 import path from "path";
@@ -30,7 +32,7 @@ function serialiseInputs(values: bigint[]): string[] {
   });
 }
 
-describe("Offchain Proof generation", function () {
+describe("Onchain Proof generation", function () {
   let pedersen: HashFunction;
 
   before(async () => {
@@ -64,19 +66,29 @@ describe("Offchain Proof generation", function () {
       signal_hash: serialiseInputs([1n])[0],
     };
 
-
-    // const [prover, verifier] = await setup_generic_prover_and_verifier(acir);
-    // const proof = await create_proof(prover, acir, abi);
-
-    // const verified = await verify_proof(verifier, proof);
-    // expect(verified).eq(true);
-
     console.log({ abi })
     fs.writeFileSync(`${__dirname}/../circuits/Prover.toml`, json2toml(abi));
 
     await promiseExec(`cd ${__dirname}/../circuits && nargo compile main`)
-    await promiseExec(`cd ${__dirname}/../circuits && nargo prove p`)
-    const { stderr } = await promiseExec(`cd ${__dirname}/../circuits && nargo verify p`)
-    expect(stderr).eq('');
+    const { stdout } = await promiseExec(`cd ${__dirname}/../circuits && nargo prove`)
+    const proof = "0x" + stdout.trim();
+
+    const [prover, verifier] = await setup_generic_prover_and_verifier(acir);
+
+    console.log({ proof })
+
+    const V = await ethers.getContractFactory("TurboVerifier");
+    const v = await V.deploy()
+    console.log(`debloyed verifier to ${v.address}`);
+
+    const S = await ethers.getContractFactory("Semaphore");
+    const s = await S.deploy(v.address)
+    console.log(`debloyed semaphore to ${s.address}`);
+
+    // const contractInput = (await create_proof(prover, acir, abi)) as Buffer;
+
+    expect(await s.verifyProof(proof)).to.equal(true);
+
+    console.log(stdout)
   });
 });

@@ -7,7 +7,7 @@ fn main(
   id_trapdoor: Field,
   siblings: [Field; LEVELS],
   indices: Field,
-  external_nullifier: Field,
+  external_nullifier: pub Field,
   root: pub Field,
   nullifier_hash: pub Field,
   signal_hash: pub Field
