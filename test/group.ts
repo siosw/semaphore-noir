@@ -23,7 +23,7 @@ describe("Group", () => {
     it("Should not create a group with a wrong tree depth", () => {
       const fun = (): Group => new Group(pedersen, 1, 33);
 
-      expect(fun).to.throw("The tree depth must be between 16 and 32");
+      expect(fun).to.throw("The tree depth must be between 1 and 32");
     });
 
     it("Should create a group with different parameters", () => {

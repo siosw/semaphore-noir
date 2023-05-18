@@ -3,7 +3,7 @@ import {
   create_proof,
   verify_proof,
 } from "@noir-lang/barretenberg";
-import { compile } from "@noir-lang/noir_wasm";
+import { compile, acir_read_bytes } from "@noir-lang/noir_wasm";
 import path from "path";
 import { expect } from "chai";
 import { serialise_public_inputs } from "@noir-lang/aztec_backend";
@@ -31,10 +31,11 @@ describe("IdentityCircuit", function () {
   });
 
   it("identity calculation should be identical in TS and Noir", async function () {
-    const compiledProgram = compile(
-      path.resolve(__dirname, "../circuits/src/identity.nr")
-    );
-    const acir = compiledProgram.circuit;
+    const compiledProgram = compile({
+      entry_point: path.resolve(__dirname, "../circuits/src/identity.nr")
+    });
+
+    const acir = acir_read_bytes(compiledProgram.circuit);
 
     const identity = new Identity(pedersen);
 
@@ -58,10 +59,11 @@ describe("IdentityCircuit", function () {
   });
 
   it("the proof can't be generated if one of the secrets is wrong", async function () {
-    const compiledProgram = compile(
-      path.resolve(__dirname, "../circuits/src/identity.nr")
-    );
-    const acir = compiledProgram.circuit;
+    const compiledProgram = compile({
+      entry_point: path.resolve(__dirname, "../circuits/src/identity.nr")
+    });
+
+    const acir = acir_read_bytes(compiledProgram.circuit);
 
     const identity = new Identity(pedersen);
 
@@ -82,10 +84,11 @@ describe("IdentityCircuit", function () {
   });
 
   it("the proof can't be generated if the commitment is wrong", async function () {
-    const compiledProgram = compile(
-      path.resolve(__dirname, "../circuits/src/identity.nr")
-    );
-    const acir = compiledProgram.circuit;
+    const compiledProgram = compile({
+      entry_point: path.resolve(__dirname, "../circuits/src/identity.nr")
+    });
+
+    const acir = acir_read_bytes(compiledProgram.circuit);
 
     const identity = new Identity(pedersen);
 

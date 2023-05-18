@@ -3,7 +3,7 @@ import {
   create_proof,
   verify_proof,
 } from "@noir-lang/barretenberg";
-import { compile } from "@noir-lang/noir_wasm";
+import { compile, acir_read_bytes } from "@noir-lang/noir_wasm";
 import { serialise_public_inputs } from "@noir-lang/aztec_backend";
 import path from "path";
 import { expect } from "chai";
@@ -32,10 +32,11 @@ describe("Offchain Proof generation", function () {
   });
 
   it("Should verify proof using abi and acir from typescript", async function () {
-    const compiledProgram = compile(
-      path.resolve(__dirname, "../circuits/src/main.nr")
-    );
-    const acir = compiledProgram.circuit;
+    const compiledProgram = compile({
+      entry_point: path.resolve(__dirname, "../circuits/src/main.nr")
+    });
+
+    const acir = acir_read_bytes(compiledProgram.circuit);
 
     const identity = new Identity(pedersen, "message");
     const group = new Group(pedersen, 1, 3);
@@ -51,9 +52,10 @@ describe("Offchain Proof generation", function () {
       id_trapdoor: serialiseInputs([identity.getTrapdoor()]),
       indices: serialiseInputs([indices]),
       siblings: serialiseInputs(merkleProof.siblings),
-      external_nullifier: serialiseInputs([1n]),
+      // external_nullifier: serialiseInputs([1n]),
       root: serialiseInputs([merkleProof.root]),
-      nullifier_hash: serialiseInputs([pedersen([1n, identity.getNullifier()])])
+      // nullifier_hash: serialiseInputs([pedersen([1n, identity.getNullifier()])]),
+      // signal_hash: serialiseInputs([1n])
     };
 
     console.log({ abi })
