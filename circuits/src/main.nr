@@ -10,7 +10,7 @@ fn main(
   external_nullifier: Field,
   root: pub Field,
   nullifier_hash: pub Field,
-  // debug: pub Field
+  signal_hash: pub Field
 ) {
   // reconstruct the commitment from the private nullfiers
   let secret = std::hash::pedersen([id_nullifier, id_trapdoor]);
@@ -25,5 +25,5 @@ fn main(
   // every topic should use a distinct external nullifier
   constrain nullifier_hash == std::hash::pedersen([external_nullifier, id_nullifier])[0];
 
-  // [root, nullifier_hash[0]]
+  signal_hash * signal_hash;
 }

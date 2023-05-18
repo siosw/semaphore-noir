@@ -61,7 +61,7 @@ describe("Offchain Proof generation", function () {
       external_nullifier: serialiseInputs([1n])[0],
       root: serialiseInputs([merkleProof.root])[0],
       nullifier_hash: serialiseInputs([pedersen([1n, identity.getNullifier()])])[0],
-      // signal_hash: serialiseInputs([1n])
+      signal_hash: serialiseInputs([1n])
     };
 
     console.log({ abi })
