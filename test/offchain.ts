@@ -11,7 +11,13 @@ import Identity from "../packages/identity";
 import hash, { pedersenFactory } from "../packages/hash";
 import { type HashFunction } from "../types";
 import Group from "../packages/group";
-//
+import { promisify } from "node:util";
+import { exec } from "child_process";
+import json2toml from "json2toml";
+import fs from "fs";
+
+const promiseExec = promisify(exec);
+
 // TODO: share serialisation functions accross files
 // to specify the value of a single field we can set an array of len == 1 in the abi
 function serialiseInputs(values: bigint[]): string[] {
@@ -48,26 +54,29 @@ describe("Offchain Proof generation", function () {
     const indices = BigInt(Number.parseInt(merkleProof.pathIndices.join(''), 2))
 
     const abi = {
-      id_nullifier: serialiseInputs([identity.getNullifier()]),
-      id_trapdoor: serialiseInputs([identity.getTrapdoor()]),
-      indices: serialiseInputs([indices]),
+      id_nullifier: serialiseInputs([identity.getNullifier()])[0],
+      id_trapdoor: serialiseInputs([identity.getTrapdoor()])[0],
+      indices: serialiseInputs([indices])[0],
       siblings: serialiseInputs(merkleProof.siblings),
-      // external_nullifier: serialiseInputs([1n]),
-      root: serialiseInputs([merkleProof.root]),
-      // nullifier_hash: serialiseInputs([pedersen([1n, identity.getNullifier()])]),
+      external_nullifier: serialiseInputs([1n])[0],
+      root: serialiseInputs([merkleProof.root])[0],
+      nullifier_hash: serialiseInputs([pedersen([1n, identity.getNullifier()])])[0],
       // signal_hash: serialiseInputs([1n])
     };
 
     console.log({ abi })
 
-    const [prover, verifier] = await setup_generic_prover_and_verifier(acir);
+    // const [prover, verifier] = await setup_generic_prover_and_verifier(acir);
+    // const proof = await create_proof(prover, acir, abi);
 
-    const proof = await create_proof(prover, acir, abi);
+    // const verified = await verify_proof(verifier, proof);
+    // expect(verified).eq(true);
 
-    const verified = await verify_proof(verifier, proof);
+    fs.writeFileSync(`${__dirname}/../circuits/Prover.toml`, json2toml(abi));
 
-    console.log(verified);
-
-    expect(verified).eq(true);
+    await promiseExec(`cd ${__dirname}/../circuits && nargo compile main`)
+    await promiseExec(`cd ${__dirname}/../circuits && nargo prove p`)
+    const { stderr } = await promiseExec(`cd ${__dirname}/../circuits && nargo verify p`)
+    expect(stderr).eq('');
   });
 });

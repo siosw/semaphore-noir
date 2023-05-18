@@ -7,8 +7,9 @@ fn main(
   id_trapdoor: Field,
   siblings: [Field; LEVELS],
   indices: Field,
-  // external_nullifier: Field,
+  external_nullifier: Field,
   root: pub Field,
+  nullifier_hash: pub Field,
   // debug: pub Field
 ) {
   // reconstruct the commitment from the private nullfiers
@@ -22,7 +23,7 @@ fn main(
 
   // the nullifier hash allows us to check how often a given identity signaled per topic
   // every topic should use a distinct external nullifier
-  // let nullifier_hash = std::hash::pedersen([external_nullifier, id_nullifier]);
+  constrain nullifier_hash == std::hash::pedersen([external_nullifier, id_nullifier])[0];
 
   // [root, nullifier_hash[0]]
 }
